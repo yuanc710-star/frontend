@@ -16,6 +16,7 @@ import Listings from "./pages/Listings";
 import ListingDashboard from "./pages/ListingDashboard";
 import CreateListing from "./pages/CreateListing";
 import NotFound from "./pages/NotFound";
+import SignUp from "./pages/SignUp";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/listings" element={<Listings />} />
             <Route path="/listing-dashboard" element={<ListingDashboard />} />
             <Route path="/create-listing" element={<CreateListing />} />
+            <Route path="/SignUp" element={<SignUp />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
