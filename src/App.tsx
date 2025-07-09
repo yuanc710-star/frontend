@@ -16,6 +16,7 @@ import Listings from "./pages/Listings";
 import ListingDashboard from "./pages/ListingDashboard";
 import CreateListing from "./pages/CreateListing";
 import NotFound from "./pages/NotFound";
+import CampusListingMarketplace from "./pages/CampusListingMarketplace";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/housing-tours" element={<HousingTours />} />
             <Route path="/local-businesses" element={<LocalBusinesses />} />
             <Route path="/listings" element={<Listings />} />
+            <Route path="/listingmarketplace" element={<CampusListingMarketplace />} />
             <Route path="/listing-dashboard" element={<ListingDashboard />} />
             <Route path="/create-listing" element={<CreateListing />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

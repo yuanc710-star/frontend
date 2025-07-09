@@ -166,7 +166,7 @@ const Index = () => {
             Ask questions, explore housing options, and discover opportunities.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" onClick={() => setShowAuth(true)}>
+            <Button size="lg" onClick={() => {setShowAuth(true);navigate("/listingmarketplace")}}>
               Start Your Campus Journey
             </Button>
             <Button size="lg" variant="outline" onClick={() => navigate("/listings")}>
