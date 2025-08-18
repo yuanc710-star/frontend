@@ -9,243 +9,226 @@ import { TourCard } from "@/components/TourCard";
 import { AuthDialog } from "@/components/AuthDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { Country, State, City } from 'country-state-city';
+
+const featuredTours = [
+  {
+    id: 1,
+    title: "Complete Stanford Campus Experience",
+    university: "Stanford University",
+    city: "Stanford",
+    stateCode: "CA",
+    countryCode: "US",
+    guide: {
+      name: "Sarah Chen",
+      major: "Computer Science",
+      year: "Junior",
+      rating: 4.9,
+      avatar: "/placeholder.svg",
+      languages: ["English", "Mandarin"],
+      country: "USA",
+      specialties: ["Engineering", "Research"]
+    },
+    duration: 90,
+    price: 25,
+    description: "Comprehensive tour covering academics, student life, and research facilities",
+    image: "/placeholder.svg",
+    tags: ["Engineering", "Research", "Campus Life"],
+    availableSlots: ["Today 2:00 PM", "Today 4:30 PM", "Tomorrow 10:00 AM"]
+  },
+  {
+    id: 2,
+    title: "MIT Engineering Focus Tour",
+    university: "MIT",
+    city: "Cambridge",
+    stateCode: "MA",
+    countryCode: "US",
+    guide: {
+      name: "Alex Rodriguez",
+      major: "Mechanical Engineering",
+      year: "Senior",
+      rating: 4.8,
+      avatar: "/placeholder.svg",
+      languages: ["English", "Spanish"],
+      country: "Mexico",
+      specialties: ["Engineering", "Labs"]
+    },
+    duration: 75,
+    price: 30,
+    description: "Deep dive into MIT's engineering programs and labs",
+    image: "/placeholder.svg",
+    tags: ["Engineering", "Labs", "Research"],
+    availableSlots: ["Today 3:00 PM", "Tomorrow 9:00 AM", "Tomorrow 2:00 PM"]
+  },
+  {
+    id: 3,
+    title: "Harvard Liberal Arts Experience",
+    university: "Harvard University",
+    city: "Cambridge",
+    stateCode: "MA",
+    countryCode: "US",
+    guide: {
+      name: "Emma Thompson",
+      major: "English Literature",
+      year: "Sophomore",
+      rating: 4.9,
+      avatar: "/placeholder.svg",
+      languages: ["English", "French"],
+      country: "USA",
+      specialties: ["Liberal Arts", "History"]
+    },
+    duration: 60,
+    price: 35,
+    description: "Explore Harvard's renowned liberal arts programs and historic campus",
+    image: "/placeholder.svg",
+    tags: ["Liberal Arts", "History", "Academics"],
+    availableSlots: ["Today 1:00 PM", "Today 5:00 PM", "Tomorrow 11:00 AM"]
+  },
+  {
+    id: 4,
+    title: "UC Berkeley Innovation Tour",
+    university: "UC Berkeley",
+    city: "Berkeley",
+    stateCode: "CA",
+    countryCode: "US",
+    guide: {
+      name: "Priya Patel",
+      major: "Business Administration",
+      year: "Junior",
+      rating: 4.7,
+      avatar: "/placeholder.svg",
+      languages: ["English", "Hindi"],
+      country: "India",
+      specialties: ["Business", "Innovation"]
+    },
+    duration: 85,
+    price: 28,
+    description: "Explore Berkeley's entrepreneurship programs and innovation hubs",
+    image: "/placeholder.svg",
+    tags: ["Business", "Innovation", "Entrepreneurship"],
+    availableSlots: ["Today 4:00 PM", "Tomorrow 1:00 PM", "Tomorrow 3:00 PM"]
+  }
+];
 
 const Index = () => {
+ const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [selectedState, setSelectedState] = useState<string | null>(null);
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  const [selectedUniversity, setSelectedUniversity] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedUniversity, setSelectedUniversity] = useState("all");
-  const [selectedDuration, setSelectedDuration] = useState("all");
-  const [selectedLanguage, setSelectedLanguage] = useState("all");
-  const [selectedMajor, setSelectedMajor] = useState("all");
-  const [showAuth, setShowAuth] = useState(false);
-  const { user, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
 
-  const featuredTours = [
-    {
-      id: 1,
-      title: "Complete Stanford Campus Experience",
-      university: "Stanford University",
-      guide: {
-        name: "Sarah Chen",
-        major: "Computer Science",
-        year: "Junior",
-        rating: 4.9,
-        avatar: "/placeholder.svg",
-        languages: ["English", "Mandarin"],
-        country: "USA",
-        specialties: ["Engineering", "Research"]
-      },
-      duration: 90,
-      price: 25,
-      description: "Comprehensive tour covering academics, student life, and research facilities",
-      image: "/placeholder.svg",
-      tags: ["Engineering", "Research", "Campus Life"],
-      availableSlots: ["Today 2:00 PM", "Today 4:30 PM", "Tomorrow 10:00 AM"]
-    },
-    {
-      id: 2,
-      title: "MIT Engineering Focus Tour",
-      university: "MIT",
-      guide: {
-        name: "Alex Rodriguez",
-        major: "Mechanical Engineering",
-        year: "Senior",
-        rating: 4.8,
-        avatar: "/placeholder.svg",
-        languages: ["English", "Spanish"],
-        country: "Mexico",
-        specialties: ["Engineering", "Labs"]
-      },
-      duration: 75,
-      price: 30,
-      description: "Deep dive into MIT's engineering programs and labs",
-      image: "/placeholder.svg",
-      tags: ["Engineering", "Labs", "Research"],
-      availableSlots: ["Today 3:00 PM", "Tomorrow 9:00 AM", "Tomorrow 2:00 PM"]
-    },
-    {
-      id: 3,
-      title: "Harvard Liberal Arts Experience",
-      university: "Harvard University",
-      guide: {
-        name: "Emma Thompson",
-        major: "English Literature",
-        year: "Sophomore",
-        rating: 4.9,
-        avatar: "/placeholder.svg",
-        languages: ["English", "French"],
-        country: "USA",
-        specialties: ["Liberal Arts", "History"]
-      },
-      duration: 60,
-      price: 35,
-      description: "Explore Harvard's renowned liberal arts programs and historic campus",
-      image: "/placeholder.svg",
-      tags: ["Liberal Arts", "History", "Academics"],
-      availableSlots: ["Today 1:00 PM", "Today 5:00 PM", "Tomorrow 11:00 AM"]
-    },
-    {
-      id: 4,
-      title: "UC Berkeley Innovation Tour",
-      university: "UC Berkeley",
-      guide: {
-        name: "Priya Patel",
-        major: "Business Administration",
-        year: "Junior",
-        rating: 4.7,
-        avatar: "/placeholder.svg",
-        languages: ["English", "Hindi"],
-        country: "India",
-        specialties: ["Business", "Innovation"]
-      },
-      duration: 85,
-      price: 28,
-      description: "Explore Berkeley's entrepreneurship programs and innovation hubs",
-      image: "/placeholder.svg",
-      tags: ["Business", "Innovation", "Entrepreneurship"],
-      availableSlots: ["Today 4:00 PM", "Tomorrow 1:00 PM", "Tomorrow 3:00 PM"]
-    }
-  ];
+  const getCountryOptions = () => Country.getAllCountries();
+  const getStateOptions = (countryCode: string) => State.getStatesOfCountry(countryCode);
+  const getCityOptions = (countryCode: string, stateCode: string) => City.getCitiesOfState(countryCode, stateCode);
 
-  const universities = ["Stanford University", "MIT", "Harvard University", "UC Berkeley", "UCLA"];
-  const languages = ["English", "Spanish", "Mandarin", "French", "German", "Hindi"];
-  const majors = ["Computer Science", "Engineering", "Business", "Liberal Arts", "Sciences", "Medicine"];
+  const getUniversityOptions = () => {
+    return Array.from(new Set(
+      featuredTours.filter(t =>
+        (!selectedCountry || t.countryCode === selectedCountry) &&
+        (!selectedState || t.stateCode === selectedState) &&
+        (!selectedCity || t.city === selectedCity)
+      ).map(t => t.university)
+    ));
+  };
 
-  const filteredTours = featuredTours.filter(tour => {
-    const matchesSearch = tour.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         tour.university.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         tour.guide.major.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesUniversity = selectedUniversity === "all" || tour.university === selectedUniversity;
-    const matchesDuration = selectedDuration === "all" || 
-                           (selectedDuration === "short" && tour.duration <= 60) ||
-                           (selectedDuration === "medium" && tour.duration > 60 && tour.duration <= 90) ||
-                           (selectedDuration === "long" && tour.duration > 90);
-    const matchesLanguage = selectedLanguage === "all" || 
-                           tour.guide.languages.some(lang => lang.toLowerCase() === selectedLanguage.toLowerCase());
-    const matchesMajor = selectedMajor === "all" || 
-                        tour.guide.major.toLowerCase().includes(selectedMajor.toLowerCase());
-    
-    return matchesSearch && matchesUniversity && matchesDuration && matchesLanguage && matchesMajor;
-  });
+  const filteredTours = featuredTours.filter(tour =>
+    (!selectedCountry || tour.countryCode === selectedCountry) &&
+    (!selectedState || tour.stateCode === selectedState) &&
+    (!selectedCity || tour.city === selectedCity) &&
+    (!selectedUniversity || tour.university === selectedUniversity) &&
+    (tour.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     tour.university.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     tour.guide.major.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50">
-      {/* Header */}
       <header className="bg-white/90 backdrop-blur-md border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Video className="h-8 w-8 text-blue-600" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-orange-500 bg-clip-text text-transparent">
-                CampusTours Live
-              </h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              {isAuthenticated && (
-                <Button 
-                  variant="outline" 
-                  onClick={() => navigate("/dashboard")}
-                >
-                  Dashboard
-                </Button>
-              )}
-              <AuthDialog />
-            </div>
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Video className="h-8 w-8 text-blue-600" />
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-orange-500 bg-clip-text text-transparent">
+              CampusTours Live
+            </h1>
+          </div>
+          <div className="flex items-center space-x-4">
+            {isAuthenticated && (
+              <Button variant="outline" onClick={() => navigate("/dashboard")}>Dashboard</Button>
+            )}
+            <AuthDialog />
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
       <section className="py-20 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
             Experience Campus Life Through Live Student-Guided Tours
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            Connect with current students for authentic, real-time virtual campus tours. 
+            Connect with current students for authentic, real-time virtual campus tours.
             Ask questions, explore housing options, and discover opportunities.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" onClick={() => {setShowAuth(true);navigate("/listingmarketplace")}}>
-              Start Your Campus Journey
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate("/listings")}>
-              Browse Campus Listings
-            </Button>
+            {/* <Button size="lg" onClick={() => navigate("/listingmarketplace")}>Start Your Campus Journey</Button> */}
+            <Button size="lg" variant="outline" onClick={() => navigate("/listings")}>Browse Campus Listings</Button>
           </div>
         </div>
       </section>
 
-      {/* Enhanced Search and Filters */}
       <section className="py-8 px-4 bg-white/50">
-        <div className="container mx-auto">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-8">
-              <div className="md:col-span-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <Input
-                    placeholder="Search tours, universities, or majors..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 h-12"
-                  />
-                </div>
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-8">
+            <div className="md:col-span-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Input
+                  placeholder="Search tours, universities, or majors..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 h-12"
+                />
               </div>
-              
-              <Select value={selectedUniversity} onValueChange={setSelectedUniversity}>
-                <SelectTrigger className="h-12">
-                  <SelectValue placeholder="All Universities" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Universities</SelectItem>
-                  {universities.map((uni) => (
-                    <SelectItem key={uni} value={uni}>{uni}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={selectedMajor} onValueChange={setSelectedMajor}>
-                <SelectTrigger className="h-12">
-                  <SelectValue placeholder="All Majors" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Majors</SelectItem>
-                  {majors.map((major) => (
-                    <SelectItem key={major} value={major}>{major}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
-                <SelectTrigger className="h-12">
-                  <SelectValue placeholder="Any Language" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Any Language</SelectItem>
-                  {languages.map((lang) => (
-                    <SelectItem key={lang} value={lang}>{lang}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={selectedDuration} onValueChange={setSelectedDuration}>
-                <SelectTrigger className="h-12">
-                  <SelectValue placeholder="Tour Duration" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Any Duration</SelectItem>
-                  <SelectItem value="short">Short (≤60 min)</SelectItem>
-                  <SelectItem value="medium">Medium (60-90 min)</SelectItem>
-                  <SelectItem value="long">Long (90+ min)</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
+            <Select onValueChange={setSelectedCountry}>
+              <SelectTrigger className="h-12"><SelectValue placeholder="Select Country" /></SelectTrigger>
+              <SelectContent>
+                {getCountryOptions().map(c => (
+                  <SelectItem key={c.isoCode} value={c.isoCode}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select disabled={!selectedCountry} onValueChange={setSelectedState}>
+              <SelectTrigger className="h-12"><SelectValue placeholder="Select State" /></SelectTrigger>
+              <SelectContent>
+                {selectedCountry && getStateOptions(selectedCountry).map(s => (
+                  <SelectItem key={s.isoCode} value={s.isoCode}>{s.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select disabled={!selectedState} onValueChange={setSelectedCity}>
+              <SelectTrigger className="h-12"><SelectValue placeholder="Select City" /></SelectTrigger>
+              <SelectContent>
+                {selectedCountry && selectedState && getCityOptions(selectedCountry, selectedState).map(city => (
+                  <SelectItem key={city.name} value={city.name}>{city.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select disabled={!selectedCity} onValueChange={setSelectedUniversity}>
+              <SelectTrigger className="h-12"><SelectValue placeholder="Select University" /></SelectTrigger>
+              <SelectContent>
+                {getUniversityOptions().map(u => (
+                  <SelectItem key={u} value={u}>{u}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </section>
 
-      {/* Featured Tours */}
       <section className="py-12 px-4">
         <div className="container mx-auto">
           <div className="flex items-center justify-between mb-8">
@@ -256,7 +239,7 @@ const Index = () => {
               {filteredTours.length} available now
             </Badge>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredTours.map((tour) => (
               <TourCard key={tour.id} tour={tour} />
@@ -268,13 +251,13 @@ const Index = () => {
               <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">No tours found</h3>
               <p className="text-gray-600">Try adjusting your search criteria or browse all available tours.</p>
-              <Button 
+              <Button
                 onClick={() => {
                   setSearchTerm("");
-                  setSelectedUniversity("all");
-                  setSelectedDuration("all");
-                  setSelectedLanguage("all");
-                  setSelectedMajor("all");
+                  setSelectedCountry(null);
+                  setSelectedState(null);
+                  setSelectedCity(null);
+                  setSelectedUniversity(null);
                 }}
                 variant="outline"
                 className="mt-4"
@@ -292,7 +275,7 @@ const Index = () => {
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Campus Resources & Opportunities</h2>
           <p className="text-lg text-gray-600">Everything you need to know about campus life</p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/listings?category=housing")}>
             <CardHeader>
@@ -301,7 +284,7 @@ const Index = () => {
               <CardDescription>Find apartments, shared housing, and rental options near campus</CardDescription>
             </CardHeader>
           </Card>
-          
+
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/listings?category=jobs")}>
             <CardHeader>
               <Briefcase className="h-8 w-8 text-green-600 mb-2" />
@@ -309,7 +292,7 @@ const Index = () => {
               <CardDescription>Discover campus jobs, internships, and local employment</CardDescription>
             </CardHeader>
           </Card>
-          
+
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/listings?category=goods")}>
             <CardHeader>
               <ShoppingBag className="h-8 w-8 text-purple-600 mb-2" />
@@ -317,7 +300,7 @@ const Index = () => {
               <CardDescription>Buy, sell, or trade textbooks, furniture, and essentials</CardDescription>
             </CardHeader>
           </Card>
-          
+
           <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate("/listings?category=activities")}>
             <CardHeader>
               <Trophy className="h-8 w-8 text-orange-600 mb-2" />
