@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import NewTourOfferingPage from "@/app/(app)/guide/tour-offerings/new/page";
-import { useMe } from "@/lib/data-access";
+import { useMe, type Me } from "@/lib/data-access";
 
 const replace = jest.fn();
 jest.mock("next/navigation", () => ({
@@ -15,16 +15,31 @@ jest.mock("@/components/offerings/CreateOfferingForm", () => ({
 
 const mockUseMe = useMe as jest.Mock;
 
+function makeMe(overrides: Partial<Me> = {}): Me {
+  return {
+    id: "u1",
+    roles: ["GUIDE"],
+    activeRole: "GUIDE",
+    participantType: null,
+    guideStatus: "APPROVED",
+    accountStatus: "ACTIVE",
+    firstName: null,
+    lastName: null,
+    displayName: null,
+    email: null,
+    ageBand: null,
+    createdAt: null,
+    ...overrides,
+  };
+}
+
 function setMe(
   overrides: Partial<ReturnType<typeof useMe>> & {
     hasRole?: (role: string) => boolean;
   } = {},
 ) {
   mockUseMe.mockReturnValue({
-    me: {
-      activeRole: "GUIDE",
-      roles: ["GUIDE"],
-    },
+    me: makeMe(),
     isLoading: false,
     hasRole: (role: string) => role === "GUIDE",
     ...overrides,
@@ -54,7 +69,7 @@ describe("NewTourOfferingPage", () => {
 
   it("redirects non-guide active roles to the dashboard", async () => {
     setMe({
-      me: { activeRole: "PARTICIPANT", roles: ["PARTICIPANT"] },
+      me: makeMe({ activeRole: "PARTICIPANT", roles: ["PARTICIPANT"], guideStatus: null }),
       hasRole: (role: string) => role === "PARTICIPANT",
     });
     render(<NewTourOfferingPage />);

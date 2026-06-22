@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TourOfferingsPage } from "@/components/offerings/TourOfferingsPage";
 import { useDashboard, useMe, useOfferings, useTourTopics } from "@/lib/data-access";
-import type { Offering } from "@/lib/data-access";
+import type { Me, Offering } from "@/lib/data-access";
 
 jest.mock("next/link", () => ({
   __esModule: true,
@@ -42,6 +42,24 @@ const sampleOffering: Offering = {
   description: "A scenic route",
 };
 
+function makeMe(overrides: Partial<Me> = {}): Me {
+  return {
+    id: "u1",
+    roles: ["GUIDE"],
+    activeRole: "GUIDE",
+    participantType: null,
+    guideStatus: "APPROVED",
+    accountStatus: "ACTIVE",
+    firstName: null,
+    lastName: null,
+    displayName: null,
+    email: null,
+    ageBand: null,
+    createdAt: null,
+    ...overrides,
+  };
+}
+
 function setHooks(
   overrides: {
     me?: Partial<ReturnType<typeof useMe>>;
@@ -51,7 +69,7 @@ function setHooks(
   } = {},
 ) {
   mockUseMe.mockReturnValue({
-    me: { guideStatus: "APPROVED", activeRole: "GUIDE" },
+    me: makeMe(),
     ...overrides.me,
   });
   mockUseDashboard.mockReturnValue({
@@ -129,9 +147,7 @@ describe("TourOfferingsPage", () => {
   it("derives canPublish from me.guideStatus when dashboard is not guide-shaped", () => {
     setHooks({
       dashboard: { data: undefined },
-      me: {
-        me: { guideStatus: "APPROVED", activeRole: "GUIDE" },
-      },
+      me: { me: makeMe() },
     });
     render(<TourOfferingsPage />);
 
