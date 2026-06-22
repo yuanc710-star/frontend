@@ -1,96 +1,151 @@
 import type { Config } from "tailwindcss";
 
 export default {
-	darkMode: ["class"],
-	content: [
-		"./pages/**/*.{ts,tsx}",
-		"./components/**/*.{ts,tsx}",
-		"./app/**/*.{ts,tsx}",
-		"./src/**/*.{ts,tsx}",
-	],
-	prefix: "",
-	theme: {
-		container: {
-			center: true,
-			padding: '2rem',
-			screens: {
-				'2xl': '1400px'
-			}
-		},
-		extend: {
-			colors: {
-				border: 'hsl(var(--border))',
-				input: 'hsl(var(--input))',
-				ring: 'hsl(var(--ring))',
-				background: 'hsl(var(--background))',
-				foreground: 'hsl(var(--foreground))',
-				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
-				},
-				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
-				},
-				destructive: {
-					DEFAULT: 'hsl(var(--destructive))',
-					foreground: 'hsl(var(--destructive-foreground))'
-				},
-				muted: {
-					DEFAULT: 'hsl(var(--muted))',
-					foreground: 'hsl(var(--muted-foreground))'
-				},
-				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
-				},
-				popover: {
-					DEFAULT: 'hsl(var(--popover))',
-					foreground: 'hsl(var(--popover-foreground))'
-				},
-				card: {
-					DEFAULT: 'hsl(var(--card))',
-					foreground: 'hsl(var(--card-foreground))'
-				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
-				}
-			},
-			borderRadius: {
-				lg: 'var(--radius)',
-				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
-			},
-			keyframes: {
-				'accordion-down': {
-					from: {
-						height: '0'
-					},
-					to: {
-						height: 'var(--radix-accordion-content-height)'
-					}
-				},
-				'accordion-up': {
-					from: {
-						height: 'var(--radix-accordion-content-height)'
-					},
-					to: {
-						height: '0'
-					}
-				}
-			},
-			animation: {
-				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
-		}
-	},
-	plugins: [require("tailwindcss-animate")],
+  darkMode: ["class"],
+  content: [
+    "./src/app/**/*.{ts,tsx}",
+    "./src/components/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
+  theme: {
+    container: {
+      center: true,
+      padding: "1.5rem",
+      screens: { "2xl": "1180px" },
+    },
+    extend: {
+      fontFamily: {
+        sans: ["var(--font-sans)"],
+        display: ["var(--font-display)"],
+      },
+      fontSize: {
+        // CampusToursLive type scale (design system)
+        display: ["clamp(42px,6vw,76px)", { lineHeight: "1.02", letterSpacing: "-0.045em", fontWeight: "700" }],
+        h1: ["clamp(42px,6vw,76px)", { lineHeight: "1.02", letterSpacing: "-0.045em", fontWeight: "700" }],
+        h2: ["clamp(30px,4vw,48px)", { lineHeight: "1.08", letterSpacing: "-0.035em", fontWeight: "700" }],
+        h3: ["21px", { lineHeight: "1.3", fontWeight: "700" }],
+        h4: ["18px", { lineHeight: "1.3", fontWeight: "700" }],
+        lead: ["19px", { lineHeight: "1.6", fontWeight: "500" }],
+        body: ["15.5px", { lineHeight: "1.55" }],
+        caption: ["13px", { lineHeight: "1.4" }],
+        eyebrow: ["13px", { lineHeight: "1.2", letterSpacing: "0.08em", fontWeight: "700" }],
+      },
+      boxShadow: {
+        sm: "var(--shadow-sm)",
+        md: "var(--shadow-md)",
+        lg: "var(--shadow-lg)",
+        card: "var(--shadow-card)",
+      },
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+          dark: "hsl(var(--brand-primary-dark))",
+          soft: "hsl(var(--brand-primary-soft))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        // ---- Extended brand palette (CampusToursLive design system) ----
+        sage: {
+          DEFAULT: "hsl(var(--brand-sage))",
+          deep: "hsl(var(--brand-sage-deep))",
+          soft: "hsl(var(--brand-sage-soft))",
+          foreground: "hsl(var(--brand-sage-foreground))",
+        },
+        coral: {
+          DEFAULT: "hsl(var(--brand-coral))",
+          soft: "hsl(var(--brand-coral-soft))",
+          foreground: "hsl(var(--brand-coral-foreground))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--brand-success))",
+          soft: "hsl(var(--brand-success-soft))",
+          foreground: "hsl(var(--brand-success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--brand-warning))",
+          soft: "hsl(var(--brand-warning-soft))",
+          foreground: "hsl(var(--brand-warning-foreground))",
+        },
+        error: {
+          DEFAULT: "hsl(var(--brand-error))",
+          soft: "hsl(var(--brand-error-soft))",
+          foreground: "hsl(var(--brand-error-foreground))",
+        },
+        amber: "hsl(var(--brand-amber))",
+        purple: {
+          DEFAULT: "hsl(var(--brand-purple))",
+          soft: "hsl(var(--brand-purple-soft))",
+          foreground: "hsl(var(--brand-purple-foreground))",
+        },
+        // Member role accents (participant=blue, guide=amber, guardian=purple).
+        role: {
+          participant: {
+            DEFAULT: "hsl(var(--role-participant))",
+            soft: "hsl(var(--role-participant-soft))",
+            foreground: "hsl(var(--role-participant-foreground))",
+          },
+          guide: {
+            DEFAULT: "hsl(var(--role-guide))",
+            soft: "hsl(var(--role-guide-soft))",
+            foreground: "hsl(var(--role-guide-foreground))",
+          },
+          guardian: {
+            DEFAULT: "hsl(var(--role-guardian))",
+            soft: "hsl(var(--role-guardian-soft))",
+            foreground: "hsl(var(--role-guardian-foreground))",
+          },
+        },
+        ink: {
+          DEFAULT: "hsl(var(--brand-ink))",
+          soft: "hsl(var(--brand-ink-soft))",
+        },
+        ivory: "hsl(var(--brand-ivory))",
+        canvas: "hsl(var(--brand-canvas))",
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+      },
+      maxWidth: {
+        content: "1180px",
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+        // Brand radius scale (design system --r-*). Distinct names avoid clashing
+        // with Tailwind's per-corner rounded-{t,r,b,l}-* utilities.
+        field: "var(--r-sm)",
+        card: "var(--r-md)",
+        panel: "var(--r-lg)",
+        hero: "var(--r-xl)",
+        pill: "var(--r-pill)",
+      },
+    },
+  },
+  plugins: [],
 } satisfies Config;

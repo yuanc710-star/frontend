@@ -1,36 +1,49 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import { type HTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
 
-import { cn } from "@/lib/utils"
+/**
+ * Badge — small pill label (`.badge`). For the dotted "status" pill use
+ * StatusBadge. Styles live in globals.css.
+ */
+export type BadgeVariant =
+  | "primary"
+  | "sage"
+  | "coral"
+  | "success"
+  | "warn"
+  | "verified";
 
-const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-  {
-    variants: {
-      variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
+const BADGE: Record<BadgeVariant, string> = {
+  primary: "badge-primary",
+  sage: "badge-sage",
+  coral: "badge-coral",
+  success: "badge-success",
+  warn: "badge-warn",
+  verified: "badge-verified",
+};
 
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
-
-function Badge({ className, variant, ...props }: BadgeProps) {
-  return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
-  )
+export function Badge({
+  variant = "primary",
+  className,
+  ...props
+}: { variant?: BadgeVariant } & HTMLAttributes<HTMLSpanElement>) {
+  return <span className={cn("badge", BADGE[variant], className)} {...props} />;
 }
 
-export { Badge, badgeVariants }
+/** StatusBadge — pill with a leading dot (`.status`). */
+export type StatusVariant = "info" | "warning" | "success" | "error";
+
+const STATUS: Record<StatusVariant, string> = {
+  info: "status-info",
+  warning: "status-warning",
+  success: "status-success",
+  error: "status-error",
+};
+
+export function StatusBadge({
+  variant = "info",
+  className,
+  ...props
+}: { variant?: StatusVariant } & HTMLAttributes<HTMLSpanElement>) {
+  return <span className={cn("status", STATUS[variant], className)} {...props} />;
+}

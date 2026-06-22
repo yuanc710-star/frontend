@@ -1,59 +1,45 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import { type HTMLAttributes } from "react";
+import { CircleAlert, CircleCheck, Info, TriangleAlert, type LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-import { cn } from "@/lib/utils"
+/**
+ * Alert — a block-level message / banner (`.alert`). Use for form-submit errors,
+ * inline notices, etc. Each variant renders a matching leading icon. `role`
+ * defaults to "alert" (assertive); pass role="status" for passive notes. Styles
+ * live in globals.css.
+ */
+export type AlertVariant = "info" | "warning" | "success" | "error";
 
-const alertVariants = cva(
-  "relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
-  {
-    variants: {
-      variant: {
-        default: "bg-background text-foreground",
-        destructive:
-          "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
+const ALERT: Record<AlertVariant, string> = {
+  info: "alert-info",
+  warning: "alert-warning",
+  success: "alert-success",
+  error: "alert-error",
+};
 
-const Alert = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
->(({ className, variant, ...props }, ref) => (
-  <div
-    ref={ref}
-    role="alert"
-    className={cn(alertVariants({ variant }), className)}
-    {...props}
-  />
-))
-Alert.displayName = "Alert"
+const ICON: Record<AlertVariant, LucideIcon> = {
+  info: Info,
+  warning: TriangleAlert,
+  success: CircleCheck,
+  error: CircleAlert,
+};
 
-const AlertTitle = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => (
-  <h5
-    ref={ref}
-    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
-    {...props}
-  />
-))
-AlertTitle.displayName = "AlertTitle"
+export interface AlertProps extends HTMLAttributes<HTMLDivElement> {
+  variant?: AlertVariant;
+}
 
-const AlertDescription = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("text-sm [&_p]:leading-relaxed", className)}
-    {...props}
-  />
-))
-AlertDescription.displayName = "AlertDescription"
-
-export { Alert, AlertTitle, AlertDescription }
+export function Alert({
+  variant = "info",
+  role = "alert",
+  className,
+  children,
+  ...props
+}: AlertProps) {
+  const Icon = ICON[variant];
+  return (
+    <div role={role} className={cn("alert flex items-start gap-2.5", ALERT[variant], className)} {...props}>
+      <Icon size={16} strokeWidth={2} className="mt-px shrink-0" aria-hidden />
+      <div className="min-w-0 flex-1">{children}</div>
+    </div>
+  );
+}

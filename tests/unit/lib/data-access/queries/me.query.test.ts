@@ -1,0 +1,60 @@
+import { meOptions } from "@/lib/data-access/queries/me.query";
+import { ApiError, apiJson } from "@/lib/data-access/http";
+import { queryKeys } from "@/lib/data-access/keys";
+
+// Keep the real ApiError class (me.query detects 401 via `instanceof ApiError`);
+// only the network call (apiJson) is mocked.
+jest.mock("@/lib/data-access/http", () => ({
+  ...jest.requireActual("@/lib/data-access/http"),
+  apiJson: jest.fn(),
+}));
+
+const mockedApiJson = apiJson as jest.MockedFunction<typeof apiJson>;
+
+beforeEach(() => {
+  mockedApiJson.mockReset();
+});
+
+describe("meOptions", () => {
+  it("uses the me queryKey", () => {
+    expect(meOptions().queryKey).toEqual(queryKeys.me());
+    expect(meOptions().queryKey).toEqual(["me"]);
+  });
+
+  it("queryFn fetches /v1/userinfo with interactive:false and returns the user on 200", async () => {
+    const me = { id: "me-1" };
+    mockedApiJson.mockResolvedValue(me as never);
+
+    const queryFn = meOptions().queryFn as () => Promise<unknown>;
+    const result = await queryFn();
+
+    expect(mockedApiJson).toHaveBeenCalledTimes(1);
+    expect(mockedApiJson).toHaveBeenCalledWith("/v1/userinfo", { interactive: false });
+    expect(result).toBe(me);
+  });
+
+  it("returns null when apiJson throws an ApiError with status 401", async () => {
+    mockedApiJson.mockRejectedValue(new ApiError(401, "Unauthorized"));
+
+    const queryFn = meOptions().queryFn as () => Promise<unknown>;
+    const result = await queryFn();
+
+    expect(result).toBeNull();
+  });
+
+  it("re-throws ApiError with a non-401 status", async () => {
+    const error = new ApiError(500, "Server error");
+    mockedApiJson.mockRejectedValue(error);
+
+    const queryFn = meOptions().queryFn as () => Promise<unknown>;
+    await expect(queryFn()).rejects.toBe(error);
+  });
+
+  it("re-throws non-ApiError errors (e.g. a 401-shaped plain object)", async () => {
+    const error = new Error("network down");
+    mockedApiJson.mockRejectedValue(error);
+
+    const queryFn = meOptions().queryFn as () => Promise<unknown>;
+    await expect(queryFn()).rejects.toBe(error);
+  });
+});
