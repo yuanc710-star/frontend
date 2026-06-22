@@ -6,8 +6,9 @@ import { requireAuth, cancelAuth, resetAuthGate } from "@/lib/auth";
 // next/image -> a plain <img> so the modal mounts cleanly in jsdom.
 jest.mock("next/image", () => ({
   __esModule: true,
-  // eslint-disable-next-line jsx-a11y/alt-text
-  default: (props: Record<string, unknown>) => <img {...props} />,
+  default: ({ alt, src }: { alt?: string; src?: string }) => (
+    <img alt={alt ?? ""} src={typeof src === "string" ? src : undefined} />
+  ),
 }));
 
 /**
@@ -40,9 +41,7 @@ describe("SessionExpiredModal — visibility", () => {
     render(<SessionExpiredModal />);
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    expect(
-      screen.queryByText("Sign in to continue"),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Sign in to continue")).not.toBeInTheDocument();
   });
 
   it("opens when the auth gate is triggered (requireAuth)", () => {
@@ -55,9 +54,7 @@ describe("SessionExpiredModal — visibility", () => {
 
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(screen.getByText("Sign in to continue")).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /Continue with Google/ }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Continue with Google/ })).toBeInTheDocument();
   });
 
   it("closes again when the gate is cancelled", () => {
@@ -102,17 +99,13 @@ describe("SessionExpiredModal — actions", () => {
       render(<SessionExpiredModal />);
       act(() => triggerAuthGate());
 
-      await user.click(
-        screen.getByRole("button", { name: /Continue with Google/ }),
-      );
+      await user.click(screen.getByRole("button", { name: /Continue with Google/ }));
 
       expect(assign).toHaveBeenCalledWith(
         "/auth/login?intent=signin&returnTo=%2Fdashboard%3Ftab%3Dtours",
       );
       // Shows the redirecting state and disables the button.
-      expect(
-        screen.getByRole("button", { name: /Redirecting/ }),
-      ).toBeDisabled();
+      expect(screen.getByRole("button", { name: /Redirecting/ })).toBeDisabled();
     } finally {
       Object.defineProperty(window, "location", {
         configurable: true,

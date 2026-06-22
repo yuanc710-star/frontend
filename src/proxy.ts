@@ -64,5 +64,7 @@ export const config = {
     "/staff",
     "/staff/:path*",
     "/onboarding/:path*",
+    "/guide",
+    "/guide/:path*",
   ],
 };

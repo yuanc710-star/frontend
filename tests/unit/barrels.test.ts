@@ -77,6 +77,9 @@ describe("public barrels", () => {
       "useSetActiveRole",
       "useDashboard",
       "useOnboarding",
+      "useOfferings",
+      "useCreateOffering",
+      "useActivateOffering",
     ]);
   });
 });

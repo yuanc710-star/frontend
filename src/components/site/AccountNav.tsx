@@ -81,7 +81,7 @@ const GUIDE_NAV: NavGroup[] = [
     items: [
       { label: "Upcoming tours", icon: Calendar },
       { label: "Availability", icon: Clock },
-      { label: "Tour offerings", icon: List },
+      { label: "Tour offerings", icon: List, href: "/guide/tour-offerings" },
     ],
   },
   {
@@ -150,18 +150,17 @@ export function AccountNav({ onNavigate }: { onNavigate?: () => void }) {
       {/* Groups */}
       <nav>
         {groups.map((group, gi) => (
-          <MenuSection
-            key={group.label ?? `group-${gi}`}
-            label={group.label}
-            bordered={gi > 0}
-          >
+          <MenuSection key={group.label ?? `group-${gi}`} label={group.label} bordered={gi > 0}>
             {group.items.map((item) => (
               <li key={item.label}>
                 <MenuItem
                   variant="pill"
                   icon={item.icon}
                   href={item.href}
-                  active={Boolean(item.href) && pathname === item.href}
+                  active={
+                    Boolean(item.href) &&
+                    (pathname === item.href || pathname.startsWith(`${item.href}/`))
+                  }
                   onSelect={onNavigate}
                 >
                   {item.label}
