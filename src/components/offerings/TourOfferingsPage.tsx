@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Alert, Chip, Link, SectionHeading, Spinner } from "@/components/ui";
-import { useDashboard, useMe, useOfferings, useTourTopics, type Offering } from "@/lib/data-access";
+import { useMe, useOfferings, useTourTopics, type Offering } from "@/lib/data-access";
 import { OfferingCard } from "./OfferingCard";
 import { filterOfferings, type OfferingFilter } from "./offeringStatus";
 
@@ -15,13 +15,11 @@ const FILTERS: { id: OfferingFilter; label: string }[] = [
 
 export function TourOfferingsPage() {
   const { me } = useMe();
-  const { data: dashboard } = useDashboard();
   const { data: offerings = [], isLoading, isError } = useOfferings();
   const { data: topics = [] } = useTourTopics();
   const [filter, setFilter] = useState<OfferingFilter>("all");
 
-  const canPublish =
-    dashboard?.kind === "guide" ? dashboard.canPublish : me?.guideStatus === "APPROVED";
+  const canPublish = me?.guideStatus === "APPROVED";
 
   const topicByValue = useMemo(() => new Map(topics.map((t) => [t.value, t.label])), [topics]);
 
@@ -41,15 +39,9 @@ export function TourOfferingsPage() {
         </Link>
       </div>
 
-      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Filter by status">
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by status">
         {FILTERS.map((tab) => (
-          <Chip
-            key={tab.id}
-            active={filter === tab.id}
-            onClick={() => setFilter(tab.id)}
-            role="tab"
-            aria-selected={filter === tab.id}
-          >
+          <Chip key={tab.id} active={filter === tab.id} onClick={() => setFilter(tab.id)}>
             {tab.label}
           </Chip>
         ))}

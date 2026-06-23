@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TourOfferingsPage } from "@/components/offerings/TourOfferingsPage";
-import { useDashboard, useMe, useOfferings, useTourTopics } from "@/lib/data-access";
+import { useMe, useOfferings, useTourTopics } from "@/lib/data-access";
 import type { Me, Offering } from "@/lib/data-access";
 
 jest.mock("next/link", () => ({
@@ -15,7 +15,6 @@ jest.mock("next/link", () => ({
 
 jest.mock("@/lib/data-access", () => ({
   useMe: jest.fn(),
-  useDashboard: jest.fn(),
   useOfferings: jest.fn(),
   useTourTopics: jest.fn(),
   useActivateOffering: jest.fn(() => ({
@@ -25,7 +24,6 @@ jest.mock("@/lib/data-access", () => ({
 }));
 
 const mockUseMe = useMe as jest.Mock;
-const mockUseDashboard = useDashboard as jest.Mock;
 const mockUseOfferings = useOfferings as jest.Mock;
 const mockUseTourTopics = useTourTopics as jest.Mock;
 
@@ -63,7 +61,6 @@ function makeMe(overrides: Partial<Me> = {}): Me {
 function setHooks(
   overrides: {
     me?: Partial<ReturnType<typeof useMe>>;
-    dashboard?: Partial<ReturnType<typeof useDashboard>>;
     offerings?: Partial<ReturnType<typeof useOfferings>>;
     topics?: Partial<ReturnType<typeof useTourTopics>>;
   } = {},
@@ -71,10 +68,6 @@ function setHooks(
   mockUseMe.mockReturnValue({
     me: makeMe(),
     ...overrides.me,
-  });
-  mockUseDashboard.mockReturnValue({
-    data: { kind: "guide", canPublish: true },
-    ...overrides.dashboard,
   });
   mockUseOfferings.mockReturnValue({
     data: [sampleOffering],
@@ -117,7 +110,7 @@ describe("TourOfferingsPage", () => {
     );
   });
 
-  it("shows a filter empty-state when no offerings match the tab", async () => {
+  it("shows a filter empty-state when no offerings match the filter", async () => {
     const user = userEvent.setup();
     setHooks({
       offerings: {
@@ -128,7 +121,7 @@ describe("TourOfferingsPage", () => {
     });
     render(<TourOfferingsPage />);
 
-    await user.click(screen.getByRole("tab", { name: "Draft" }));
+    await user.click(screen.getByRole("button", { name: "Draft" }));
 
     expect(screen.getByRole("alert")).toHaveTextContent("No offerings match this filter.");
   });
@@ -144,13 +137,16 @@ describe("TourOfferingsPage", () => {
     );
   });
 
-  it("derives canPublish from me.guideStatus when dashboard is not guide-shaped", () => {
-    setHooks({
-      dashboard: { data: undefined },
-      me: { me: makeMe() },
-    });
+  it("enables publish when me.guideStatus is APPROVED", () => {
     render(<TourOfferingsPage />);
 
     expect(screen.getByRole("button", { name: "Publish" })).toBeEnabled();
+  });
+
+  it("disables publish when me.guideStatus is not APPROVED", () => {
+    setHooks({ me: { me: makeMe({ guideStatus: "PENDING" }) } });
+    render(<TourOfferingsPage />);
+
+    expect(screen.getByRole("button", { name: "Publish" })).toBeDisabled();
   });
 });
