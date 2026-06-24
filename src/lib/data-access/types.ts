@@ -64,7 +64,50 @@ export interface GuideDashboard {
 export interface ParticipantDashboard {
   kind: "participant";
   participant: ParticipantProfile;
-  createdAt: string | null; // account "member since" (ISO-8601, from MeResponse.createdAt)
+  nextTour?: BookingDetail | null;
+  upcomingBookings?: BookingDetail[];
+  pendingActions?: PendingActions;
+  recommendedOfferings?: RecommendedOffering[];
+  createdAt: string | null;
+}
+export type BookingStatus =
+  | "PENDING_PAYMENT"
+  | "WAITING_FOR_GUIDE"
+  | "CONFIRMED"
+  | "COMPLETED"
+  | "CANCELLED";
+
+export interface BookingDetail {
+  id: string;
+  status: BookingStatus;
+  scheduledAt: string; // ISO-8601 UTC
+  timezone: string; // e.g. "America/Los_Angeles"
+  offeringId: string;
+  offeringTitle: string;
+  offeringImageUrl?: string | null;
+  guideName: string;
+  guideResponseDeadline?: string | null; // ISO-8601，Guide 需在此时前回应
+  universityName: string;
+  durationMin: number;
+  priceCents: number;
+  currency: string;
+}
+
+export interface PendingActions {
+  paymentsToFinish: number;
+  waitingForGuide: number;
+  reviewsToWrite: number;
+}
+
+export interface RecommendedOffering {
+  id: string;
+  title: string;
+  imageUrl?: string | null;
+  isVerifiedGuide: boolean;
+  durationMin: number;
+  priceCents: number;
+  currency: string;
+  universityName: string;
 }
 export type Dashboard = GuideDashboard | ParticipantDashboard;
 

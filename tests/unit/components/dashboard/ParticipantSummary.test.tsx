@@ -1,126 +1,132 @@
 import { render, screen } from "@testing-library/react";
 import { ParticipantSummary } from "@/components/dashboard/ParticipantSummary";
-import type { ParticipantDashboard } from "@/lib/data-access";
+import type { ParticipantDashboard, BookingDetail, RecommendedOffering } from "@/lib/data-access";
 
-// Renders the real SectionHeading + MemberCard + Alert (no mocks). Note the
-// component surfaces topics/universities as COUNTS ("N selected"), not joined
-// lists, and the email only drives an "Email verified" pill (not the address).
+function makeBooking(overrides: Partial<BookingDetail> = {}): BookingDetail {
+  return {
+    id: "b1",
+    status: "CONFIRMED",
+    scheduledAt: "2099-12-01T10:00:00Z",
+    timezone: "America/Los_Angeles",
+    offeringId: "o1",
+    offeringTitle: "Campus Tour",
+    offeringImageUrl: null,
+    guideName: "Jane Guide",
+    guideResponseDeadline: null,
+    universityName: "Test University",
+    durationMin: 60,
+    priceCents: 2000,
+    currency: "USD",
+    ...overrides,
+  };
+}
 
-function makeData(
-  overrides: Partial<ParticipantDashboard["participant"]> = {},
-): ParticipantDashboard {
+function makeOffering(id = "o1"): RecommendedOffering {
+  return {
+    id,
+    title: `Offering ${id}`,
+    imageUrl: null,
+    isVerifiedGuide: false,
+    durationMin: 30,
+    priceCents: 1500,
+    currency: "USD",
+    universityName: "Test U",
+  };
+}
+
+function makeData(overrides: Partial<ParticipantDashboard> = {}): ParticipantDashboard {
   return {
     kind: "participant",
-    participant: {
-      displayName: "Grace Hopper",
-      email: "grace@example.com",
-      participantType: "STUDENT",
-      topicsOfInterest: ["cs", "math", "physics"],
-      universitiesOfInterest: ["mit", "stanford"],
-      ...overrides,
-    },
+    participant: { displayName: "Grace Hopper" },
+    nextTour: null,
+    upcomingBookings: [],
+    pendingActions: { paymentsToFinish: 0, waitingForGuide: 0, reviewsToWrite: 0 },
+    recommendedOfferings: [],
     createdAt: "2025-03-15T00:00:00Z",
+    ...overrides,
   };
 }
 
 describe("ParticipantSummary", () => {
-  it("renders the participant display name in the heading and card", () => {
+  it("renders the welcome heading with displayName", () => {
     render(<ParticipantSummary data={makeData()} />);
-    expect(screen.getByText("Welcome, Grace Hopper.")).toBeInTheDocument();
-    // Also rendered as the MemberCard name.
-    expect(screen.getByText("Grace Hopper")).toBeInTheDocument();
+    expect(screen.getByText("Welcome back, Grace Hopper.")).toBeInTheDocument();
   });
 
-  it("renders the participant type", () => {
-    render(
-      <ParticipantSummary data={makeData({ participantType: "PARENT" })} />,
-    );
-    expect(screen.getByText("Type")).toBeInTheDocument();
-    expect(screen.getByText("PARENT")).toBeInTheDocument();
+  it("renders 'Welcome back.' when displayName is absent", () => {
+    render(<ParticipantSummary data={makeData({ participant: {} })} />);
+    expect(screen.getByText("Welcome back.")).toBeInTheDocument();
   });
 
-  it("shows the topics count as 'N selected'", () => {
-    render(
-      <ParticipantSummary
-        data={makeData({ topicsOfInterest: ["a", "b", "c"] })}
-      />,
-    );
-    expect(screen.getByText("Topics")).toBeInTheDocument();
-    expect(screen.getByText("3 selected")).toBeInTheDocument();
-  });
-
-  it("shows the universities count as 'N selected'", () => {
-    render(
-      <ParticipantSummary
-        data={makeData({ universitiesOfInterest: ["x", "y"] })}
-      />,
-    );
-    expect(screen.getByText("Universities")).toBeInTheDocument();
-    expect(screen.getByText("2 selected")).toBeInTheDocument();
-  });
-
-  it("falls back to — for empty topics and universities arrays", () => {
-    render(
-      <ParticipantSummary
-        data={makeData({ topicsOfInterest: [], universitiesOfInterest: [] })}
-      />,
-    );
-    // Both the Topics and Universities rows fall back to the em-dash.
-    expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(2);
-  });
-
-  it("falls back to — for missing topics/universities/type fields", () => {
-    const data = makeData();
-    delete data.participant.topicsOfInterest;
-    delete data.participant.universitiesOfInterest;
-    delete data.participant.participantType;
-    render(<ParticipantSummary data={data} />);
-    // Type, Topics, Universities all fall back.
-    expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(3);
-  });
-
-  it("shows the 'Email Verified' pill when email is present", () => {
+  it("renders the lead paragraph", () => {
     render(<ParticipantSummary data={makeData()} />);
-    expect(screen.getByText("Email Verified")).toBeInTheDocument();
-  });
-
-  it("omits the 'Email verified' pill when email is missing", () => {
-    const data = makeData();
-    delete data.participant.email;
-    render(<ParticipantSummary data={data} />);
-    expect(screen.queryByText("Email Verified")).not.toBeInTheDocument();
-  });
-
-  it("renders the Guardian highlight for a PARENT participant", () => {
-    render(
-      <ParticipantSummary data={makeData({ participantType: "PARENT" })} />,
-    );
-    expect(screen.getByText("Guardian consent active")).toBeInTheDocument();
-    expect(screen.queryByText("Ready to explore")).not.toBeInTheDocument();
-  });
-
-  it("renders the explorer highlight for a non-PARENT participant", () => {
-    render(
-      <ParticipantSummary data={makeData({ participantType: "STUDENT" })} />,
-    );
-    expect(screen.getByText("Ready to explore")).toBeInTheDocument();
     expect(
-      screen.queryByText("Guardian consent active"),
-    ).not.toBeInTheDocument();
+      screen.getByText(
+        "Manage your next tour, finish anything that needs attention, and keep exploring.",
+      ),
+    ).toBeInTheDocument();
   });
 
-  it("renders a bare 'Welcome.' and 'Member' when displayName is missing", () => {
-    const data = makeData();
-    delete data.participant.displayName;
-    render(<ParticipantSummary data={data} />);
-    expect(screen.getByText("Welcome.")).toBeInTheDocument();
-    expect(screen.getByText("Member")).toBeInTheDocument();
-  });
-
-  it("shows the account 'Member since' month and year", () => {
-    // makeData seeds createdAt = 2025-03-15T00:00:00Z.
+  it("always renders the NextTourCard section", () => {
     render(<ParticipantSummary data={makeData()} />);
-    expect(screen.getByText("Member since")).toBeInTheDocument();
-    expect(screen.getByText("March 2025")).toBeInTheDocument();
+    expect(screen.getByText("Next Tour")).toBeInTheDocument();
+  });
+
+  it("always renders the UpcomingToursList section", () => {
+    render(<ParticipantSummary data={makeData()} />);
+    expect(screen.getByText("Your booked tours")).toBeInTheDocument();
+  });
+
+  it("always renders the PendingActionsCard section", () => {
+    render(<ParticipantSummary data={makeData()} />);
+    expect(screen.getByText("Pending actions")).toBeInTheDocument();
+  });
+
+  it("always renders the PastToursCard section", () => {
+    render(<ParticipantSummary data={makeData()} />);
+    expect(screen.getByText("Your past tours")).toBeInTheDocument();
+  });
+
+  it("renders RecommendedSection when recommendedOfferings is non-empty", () => {
+    render(<ParticipantSummary data={makeData({ recommendedOfferings: [makeOffering("o1")] })} />);
+    expect(screen.getByText("Keep exploring")).toBeInTheDocument();
+  });
+
+  it("omits RecommendedSection when recommendedOfferings is empty", () => {
+    render(<ParticipantSummary data={makeData({ recommendedOfferings: [] })} />);
+    expect(screen.queryByText("Keep exploring")).not.toBeInTheDocument();
+  });
+
+  it("omits RecommendedSection when recommendedOfferings is absent", () => {
+    const data = makeData();
+    delete data.recommendedOfferings;
+    render(<ParticipantSummary data={data} />);
+    expect(screen.queryByText("Keep exploring")).not.toBeInTheDocument();
+  });
+
+  it("passes the WAITING_FOR_GUIDE booking as waitingBooking to PendingActionsCard", () => {
+    const waitingBooking = makeBooking({
+      status: "WAITING_FOR_GUIDE",
+      guideName: "Alex Kim",
+    });
+    render(
+      <ParticipantSummary
+        data={makeData({
+          upcomingBookings: [waitingBooking],
+          pendingActions: { paymentsToFinish: 0, waitingForGuide: 1, reviewsToWrite: 0 },
+        })}
+      />,
+    );
+    expect(screen.getByText("Guide response pending")).toBeInTheDocument();
+    expect(screen.getByText(/Alex Kim/)).toBeInTheDocument();
+  });
+
+  it("passes nextTour to NextTourCard", () => {
+    render(
+      <ParticipantSummary
+        data={makeData({ nextTour: makeBooking({ offeringTitle: "Night Walk" }) })}
+      />,
+    );
+    expect(screen.getByText("Night Walk")).toBeInTheDocument();
   });
 });

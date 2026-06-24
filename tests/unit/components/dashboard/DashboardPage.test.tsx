@@ -84,18 +84,14 @@ describe("DashboardPage", () => {
     setHook({ data: undefined });
     render(<DashboardPage />);
 
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "Failed to load your dashboard",
-    );
+    expect(screen.getByRole("alert")).toHaveTextContent("Failed to load your dashboard");
   });
 
   it("renders an error alert when data is null", () => {
     setHook({ data: null as unknown as undefined });
     render(<DashboardPage />);
 
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "Failed to load your dashboard",
-    );
+    expect(screen.getByRole("alert")).toHaveTextContent("Failed to load your dashboard");
   });
 
   it("renders the guide summary branch when data.kind is 'guide'", () => {
@@ -109,9 +105,7 @@ describe("DashboardPage", () => {
     expect(screen.getByText("Offerings")).toBeInTheDocument();
 
     // It should NOT render the participant welcome heading.
-    expect(
-      screen.queryByText(/Your participant profile is saved\./),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/Your participant profile is saved\./)).not.toBeInTheDocument();
   });
 
   it("renders the participant summary branch when data.kind is 'participant'", () => {
@@ -119,9 +113,11 @@ describe("DashboardPage", () => {
     render(<DashboardPage />);
 
     // Participant-specific signals: the welcome heading + lead copy.
-    expect(screen.getByText("Welcome, Grace Hopper.")).toBeInTheDocument();
+    expect(screen.getByText("Welcome back, Grace Hopper.")).toBeInTheDocument();
     expect(
-      screen.getByText("Your participant profile is saved."),
+      screen.getByText(
+        "Manage your next tour, finish anything that needs attention, and keep exploring.",
+      ),
     ).toBeInTheDocument();
 
     // It should NOT render the guide-only offerings row.

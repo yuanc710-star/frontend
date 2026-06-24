@@ -1,19 +1,16 @@
-import {
-  CalendarDays,
-  Compass,
-  GraduationCap,
-  ShieldCheck,
-  UserRound,
-} from "lucide-react";
-import {
-  MemberCard,
-  SectionHeading,
-  type MemberCardHighlight,
-  type MemberCardItem,
-  type MemberRole,
-} from "@/components/ui";
-import type { ParticipantDashboard } from "@/lib/data-access";
-import { formatMonthYear } from "@/lib/format";
+import { SectionHeading, Link } from "@/components/ui";
+import type { ParticipantDashboard, PendingActions } from "@/lib/data-access";
+import { NextTourCard } from "./participant/NextTourCard";
+import { UpcomingToursList } from "./participant/UpcomingToursList";
+import { PendingActionsCard } from "./participant/PendingActionsCard";
+import { RecommendedSection } from "./participant/RecommendedSection";
+import { PastToursCard } from "./participant/PastToursCard";
+
+const EMPTY_ACTIONS: PendingActions = {
+  paymentsToFinish: 0,
+  waitingForGuide: 0,
+  reviewsToWrite: 0,
+};
 
 /**
  * Participant dashboard slice — presentational. The /v1/dashboard aggregate already
@@ -22,61 +19,42 @@ import { formatMonthYear } from "@/lib/format";
  */
 export function ParticipantSummary({ data }: { data: ParticipantDashboard }) {
   const p = data.participant;
-  // A parent/guardian participant reads as a Guardian card (purple accent).
-  const guardian = p.participantType === "PARENT";
-  const role: MemberRole = guardian ? "GUARDIAN" : "PARTICIPANT";
+  const nextTour = data.nextTour ?? null;
+  const upcomingBookings = data.upcomingBookings ?? [];
+  const pendingActions = data.pendingActions ?? EMPTY_ACTIONS;
+  const recommendedOfferings = data.recommendedOfferings ?? [];
 
-  const items: MemberCardItem[] = [
-    { icon: UserRound, label: "Type", value: p.participantType ?? "—" },
-    {
-      icon: Compass,
-      label: "Topics",
-      value: p.topicsOfInterest?.length
-        ? `${p.topicsOfInterest.length} selected`
-        : "—",
-    },
-    {
-      icon: GraduationCap,
-      label: "Universities",
-      value: p.universitiesOfInterest?.length
-        ? `${p.universitiesOfInterest.length} selected`
-        : "—",
-    },
-    {
-      icon: CalendarDays,
-      label: "Member since",
-      value: formatMonthYear(data.createdAt),
-    },
-  ];
-
-  const highlight: MemberCardHighlight = guardian
-    ? {
-        icon: ShieldCheck,
-        title: "Guardian consent active",
-        description: "You can manage consent and preferences.",
-      }
-    : {
-        icon: Compass,
-        title: "Ready to explore",
-        description: "Browse live campus tours from verified student guides.",
-      };
+  const waitingBooking = upcomingBookings.find((b) => b.status === "WAITING_FOR_GUIDE") ?? null;
 
   return (
     <div>
-      <SectionHeading
-        eyebrow="Dashboard"
-        title={`Welcome${p.displayName ? `, ${p.displayName}` : ""}.`}
-        lead="Your participant profile is saved."
-      />
+      {/* Welcome header */}
+      <div className="flex items-start justify-between mb-8">
+        <SectionHeading
+          eyebrow="Participant Dashboard"
+          title={`Welcome back${p.displayName ? `, ${p.displayName}` : ""}.`}
+          lead="Manage your next tour, finish anything that needs attention, and keep exploring."
+        />
+        <Link href="/tours" variant="primary" className="shrink-0 mt-2">
+          Find a Tour
+        </Link>
+      </div>
 
-      <MemberCard
-        className="mt-8"
-        name={p.displayName ?? "Member"}
-        role={role}
-        verification={p.email ? "Email Verified" : undefined}
-        items={items}
-        highlight={highlight}
-      />
+      {/* Two-column layout */}
+      <div className="grid grid-cols-[1fr_300px] gap-6 items-start">
+        {/* Left column: booking timeline + recommendations */}
+        <div className="flex flex-col gap-6">
+          <NextTourCard booking={nextTour} />
+          <UpcomingToursList bookings={upcomingBookings} />
+          <RecommendedSection offerings={recommendedOfferings} />
+        </div>
+
+        {/* Right column: attention items + history */}
+        <div className="flex flex-col gap-6">
+          <PendingActionsCard actions={pendingActions} waitingBooking={waitingBooking} />
+          <PastToursCard />
+        </div>
+      </div>
     </div>
   );
 }

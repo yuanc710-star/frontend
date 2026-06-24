@@ -30,4 +30,8 @@ export type {
   ParticipantDashboard,
   OnboardingProgress,
   OnboardingStep,
+  BookingDetail,
+  BookingStatus,
+  PendingActions,
+  RecommendedOffering,
 } from "./types";
