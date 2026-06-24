@@ -4,16 +4,12 @@ import { Alert } from "@/components/ui";
 import { useDashboard } from "@/lib/data-access";
 import { ParticipantSummary } from "@/components/dashboard/ParticipantSummary";
 import { GuideSummary } from "@/components/dashboard/GuideSummary";
-import { MOCK_PARTICIPANT_DASHBOARD } from "@/lib/data-access/mocks/dashboard.mock";
-
 /**
  * Shared signed-in dashboard — one route, one BFF aggregate. The BFF reads the
  * active role and returns a role-shaped payload (`kind`); this page just renders by
  * `kind` (the role-branch decision lives in the BFF, not here). Switching role
  * invalidates ["dashboard"], so it re-renders the other area in place — no navigation.
  * AppShell provides the centered grid, so the summaries render bare.
- *
- * TODO: remove MOCK_PARTICIPANT_DASHBOARD overlay once BFF returns booking fields.
  */
 export default function DashboardPage() {
   const { data, isLoading, isError } = useDashboard();
@@ -23,7 +19,5 @@ export default function DashboardPage() {
 
   if (data.kind === "guide") return <GuideSummary data={data} />;
 
-  // Overlay mock booking data until BFF returns these fields.
-  const participantData = { ...MOCK_PARTICIPANT_DASHBOARD, participant: data.participant };
-  return <ParticipantSummary data={participantData} />;
+  return <ParticipantSummary data={data} />;
 }
