@@ -1,6 +1,23 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Home } from "lucide-react";
+
+jest.mock("next/link", () => ({
+  __esModule: true,
+  default: ({ href, children, onClick, ...props }: any) => (
+    <a
+      href={href}
+      onClick={(e) => {
+        e.preventDefault();
+        onClick?.(e);
+      }}
+      {...props}
+    >
+      {children}
+    </a>
+  ),
+}));
+
 import { MenuItem } from "@/components/ui/MenuItem";
 
 describe("MenuItem — element type", () => {

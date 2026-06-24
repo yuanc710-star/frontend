@@ -13,6 +13,7 @@ function offering(id: string): Offering {
     slug: `tour-${id}`,
     status: "PUBLISHED",
     topic: "general",
+    universityId: null,
     durationMin: 30,
     priceCents: 1000,
     currency: "USD",
@@ -91,18 +92,14 @@ describe("GuideSummary", () => {
   it("shows the under-review highlight when canPublish is false", () => {
     render(<GuideSummary data={makeData({ canPublish: false })} />);
     expect(screen.getByText("Application under review")).toBeInTheDocument();
-    expect(
-      screen.getByText("Hosting unlocks once an admin approves you."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Hosting unlocks once an admin approves you.")).toBeInTheDocument();
     // Unverified guides get the plain "Student Guide" role label.
     expect(screen.getByText("Student Guide")).toBeInTheDocument();
   });
 
   it("does NOT show the under-review highlight when canPublish is true", () => {
     render(<GuideSummary data={makeData({ canPublish: true })} />);
-    expect(
-      screen.queryByText("Application under review"),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Application under review")).not.toBeInTheDocument();
     // Instead it shows the approved-to-host highlight.
     expect(screen.getByText("Approved to host")).toBeInTheDocument();
     // Role pill is always "Student Guide"; "verified" is conveyed by the green pill.
