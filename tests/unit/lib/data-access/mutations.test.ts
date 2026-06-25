@@ -2,6 +2,8 @@ import type { QueryClient } from "@tanstack/react-query";
 import { setActiveRoleMutation } from "@/lib/data-access/mutations/set-active-role.mutation";
 import { updateParticipantProfileMutation } from "@/lib/data-access/mutations/update-participant-profile.mutation";
 import { updateGuideProfileMutation } from "@/lib/data-access/mutations/update-guide-profile.mutation";
+import { createOfferingMutation } from "@/lib/data-access/mutations/create-offering.mutation";
+import { activateOfferingMutation } from "@/lib/data-access/mutations/activate-offering.mutation";
 import { postJson, patchJson } from "@/lib/data-access/http";
 import { queryKeys } from "@/lib/data-access/keys";
 
@@ -64,10 +66,7 @@ describe("updateParticipantProfileMutation", () => {
     await mutationFn(body as never);
 
     expect(mockedPatchJson).toHaveBeenCalledTimes(1);
-    expect(mockedPatchJson).toHaveBeenCalledWith(
-      "/v1/participant/profile",
-      body,
-    );
+    expect(mockedPatchJson).toHaveBeenCalledWith("/v1/participant/profile", body);
     expect(mockedPostJson).not.toHaveBeenCalled();
   });
 
@@ -107,5 +106,54 @@ describe("updateGuideProfileMutation", () => {
     expect(keys).toContainEqual(queryKeys.dashboard());
     expect(keys).toContainEqual(queryKeys.onboarding("guide"));
     expect(qc.invalidateQueries).toHaveBeenCalledTimes(4);
+  });
+});
+
+describe("createOfferingMutation", () => {
+  it("mutationFn POSTs /v1/guide/offerings with the body", async () => {
+    const qc = makeQc();
+    const body = {
+      title: "Campus walk",
+      universityId: "uni-1",
+      topic: "GENERAL_CAMPUS",
+      durationMin: 60,
+      priceCents: 4200,
+    };
+    const { mutationFn } = createOfferingMutation(qc);
+
+    await mutationFn(body);
+
+    expect(mockedPostJson).toHaveBeenCalledWith("/v1/guide/offerings", body);
+  });
+
+  it("onSuccess invalidates offerings and dashboard", () => {
+    const qc = makeQc();
+    createOfferingMutation(qc).onSuccess();
+
+    const keys = invalidatedKeys(qc);
+    expect(keys).toContainEqual(queryKeys.offerings());
+    expect(keys).toContainEqual(queryKeys.dashboard());
+    expect(qc.invalidateQueries).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("activateOfferingMutation", () => {
+  it("mutationFn POSTs activate with an empty body", async () => {
+    const qc = makeQc();
+    const { mutationFn } = activateOfferingMutation(qc);
+
+    await mutationFn("offering-1");
+
+    expect(mockedPostJson).toHaveBeenCalledWith("/v1/guide/offerings/offering-1/activate", {});
+  });
+
+  it("onSuccess invalidates offerings and dashboard", () => {
+    const qc = makeQc();
+    activateOfferingMutation(qc).onSuccess();
+
+    const keys = invalidatedKeys(qc);
+    expect(keys).toContainEqual(queryKeys.offerings());
+    expect(keys).toContainEqual(queryKeys.dashboard());
+    expect(qc.invalidateQueries).toHaveBeenCalledTimes(2);
   });
 });

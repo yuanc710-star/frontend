@@ -40,16 +40,29 @@ export interface GuideProfile {
   classYear?: string;
 }
 
-/** A guide's sellable tour offering (subset surfaced on the dashboard). */
+/** A guide's sellable tour offering (Core TourOfferingResponse). */
 export interface Offering {
   id: string;
   title: string;
   slug: string;
   status: string;
   topic: string | null;
+  universityId: string | null;
   durationMin: number;
   priceCents: number;
   currency: string;
+  description?: string | null;
+}
+
+/** Body for POST /v1/guide/offerings — creates a DRAFT offering. */
+export interface CreateOfferingInput {
+  title: string;
+  universityId: string;
+  topic: string;
+  durationMin: number;
+  priceCents: number;
+  description?: string;
+  languages?: string[];
 }
 
 /** GET /v1/dashboard — the role-shaped home aggregate (discriminated by `kind`). */

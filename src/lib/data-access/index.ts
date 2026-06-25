@@ -14,6 +14,9 @@ export { useUpdateGuideProfile } from "./hooks/use-update-guide-profile";
 export { useSetActiveRole } from "./hooks/use-set-active-role";
 export { useDashboard } from "./hooks/use-dashboard";
 export { useOnboarding } from "./hooks/use-onboarding";
+export { useOfferings } from "./hooks/use-offerings";
+export { useCreateOffering } from "./hooks/use-create-offering";
+export { useActivateOffering } from "./hooks/use-activate-offering";
 
 export type {
   Me,
@@ -25,6 +28,7 @@ export type {
   University,
   TourTopic,
   Offering,
+  CreateOfferingInput,
   Dashboard,
   GuideDashboard,
   ParticipantDashboard,

@@ -21,20 +21,19 @@ describe("queryKeys", () => {
     it("dashboard() → ['dashboard']", () => {
       expect(queryKeys.dashboard()).toEqual(["dashboard"]);
     });
+
+    it("offerings() → ['guide-offerings']", () => {
+      expect(queryKeys.offerings()).toEqual(["guide-offerings"]);
+    });
   });
 
   describe("universitySearch(q)", () => {
     it("returns ['university-search', q]", () => {
-      expect(queryKeys.universitySearch("mit")).toEqual([
-        "university-search",
-        "mit",
-      ]);
+      expect(queryKeys.universitySearch("mit")).toEqual(["university-search", "mit"]);
     });
 
     it("varies by q", () => {
-      expect(queryKeys.universitySearch("mit")).not.toEqual(
-        queryKeys.universitySearch("yale"),
-      );
+      expect(queryKeys.universitySearch("mit")).not.toEqual(queryKeys.universitySearch("yale"));
     });
 
     it("handles an empty query string", () => {
@@ -55,16 +54,11 @@ describe("queryKeys", () => {
     });
 
     it("varies by role", () => {
-      expect(queryKeys.onboarding("guide")).not.toEqual(
-        queryKeys.onboarding("participant"),
-      );
+      expect(queryKeys.onboarding("guide")).not.toEqual(queryKeys.onboarding("participant"));
     });
 
     it("preserves the exact role value", () => {
-      expect(queryKeys.onboarding("participant")).toEqual([
-        "onboarding",
-        "participant",
-      ]);
+      expect(queryKeys.onboarding("participant")).toEqual(["onboarding", "participant"]);
     });
   });
 
@@ -75,6 +69,7 @@ describe("queryKeys", () => {
       ["guideProfile", () => queryKeys.guideProfile()],
       ["tourTopics", () => queryKeys.tourTopics()],
       ["dashboard", () => queryKeys.dashboard()],
+      ["offerings", () => queryKeys.offerings()],
       ["universitySearch", () => queryKeys.universitySearch("x")],
       ["onboarding", () => queryKeys.onboarding("x")],
     ];
@@ -95,6 +90,7 @@ describe("queryKeys", () => {
         queryKeys.guideProfile(),
         queryKeys.tourTopics(),
         queryKeys.dashboard(),
+        queryKeys.offerings(),
         queryKeys.universitySearch("x"),
         queryKeys.onboarding("x"),
       ];

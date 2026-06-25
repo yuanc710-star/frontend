@@ -29,6 +29,7 @@ const guideData: GuideDashboard = {
       slug: "campus-walk",
       status: "PUBLISHED",
       topic: "general",
+      universityId: null,
       durationMin: 45,
       priceCents: 1000,
       currency: "USD",
