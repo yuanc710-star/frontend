@@ -83,6 +83,11 @@ export interface ParticipantDashboard {
   recommendedOfferings?: RecommendedOffering[];
   createdAt: string | null;
 }
+/**
+ * BFF-facing display status — the BFF maps Core's internal 16-value booking_status
+ * enum to these five strings via BookingStatus.displayStatus(). The frontend never
+ * sees raw Core enum values.
+ */
 export type BookingStatus =
   | "PENDING_PAYMENT"
   | "WAITING_FOR_GUIDE"
